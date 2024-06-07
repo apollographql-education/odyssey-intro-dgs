@@ -1,11 +1,67 @@
 package com.example.listings.datafetchers;
-import com.netflix.graphql.dgs.DgsComponent;
-import com.netflix.graphql.dgs.DgsQuery;
+import com.netflix.graphql.dgs.*;
+
+import com.example.listings.models.ListingModel;
+import java.util.List;
+import com.example.listings.datasources.ListingService;
+import com.example.listings.generated.types.Amenity;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.netflix.graphql.dgs.DgsMutation;
+import com.example.listings.generated.types.CreateListingInput;
+import com.example.listings.generated.types.CreateListingResponse;
+import java.io.IOException;
+import java.util.Objects;
 
 @DgsComponent
 public class ListingDataFetcher {
-    @DgsQuery
-    public void featuredListings() {
-        // specific featuredListings-fetching logic goes here
+
+    private final ListingService listingService;
+
+    @Autowired
+    public ListingDataFetcher(ListingService listingService) {
+        this.listingService = listingService;
     }
+
+    @DgsQuery
+    public List<ListingModel> featuredListings() throws IOException {
+        return listingService.featuredListingsRequest();
+    }
+
+    @DgsQuery
+    public ListingModel listing(@InputArgument String id) {
+        return listingService.listingRequest(id);
+    }
+
+    @DgsData(parentType="Listing")
+    public List<Amenity> amenities(DgsDataFetchingEnvironment dfe) throws IOException {
+        ListingModel listing = dfe.getSource();
+        String id = listing.getId();
+        String localContext = dfe.getLocalContext();
+
+        if (Objects.equals(localContext, "listing")) {
+            return listing.getAmenities();
+        }
+
+        return listingService.amenitiesRequest(id);
+    }
+
+    @DgsMutation
+    public CreateListingResponse createListing(@InputArgument CreateListingInput input) {
+        CreateListingResponse response = new CreateListingResponse();
+        try {
+            ListingModel createdListing = listingService.createListingRequest(input);
+            response.setListing(createdListing);
+            response.setCode(200);
+            response.setMessage("success");
+            response.setSuccess(true);
+        } catch (Exception e) {
+            response.setListing(null);
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+            response.setSuccess(false);
+        }
+
+        return response;
+    }
+
 }
