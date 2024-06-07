@@ -5,12 +5,6 @@ type Listing {
     title: String!
     "The listing's description"
     description: String!
-    "The number of beds available"
-    numOfBeds: Int
-    "The cost per night"
-    costPerNight: Float
-    "Indicates whether listing is closed for bookings (on hiatus)"
-    closedForBookings: Boolean
     "The amenities available for this listing"
     amenities: [Amenity!]!
 }
