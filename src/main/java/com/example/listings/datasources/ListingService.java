@@ -15,7 +15,7 @@ import org.springframework.http.converter.json.MappingJacksonValue;
 
 @Component
 public class ListingService {
-    private static final String LISTING_API_URL = "http://localhost:4010";
+    private static final String LISTING_API_URL = "https://rt-airlock-services-listing.herokuapp.com";
     private final RestClient client = RestClient.builder().baseUrl(LISTING_API_URL).build();
 
     private final ObjectMapper mapper = new ObjectMapper();
