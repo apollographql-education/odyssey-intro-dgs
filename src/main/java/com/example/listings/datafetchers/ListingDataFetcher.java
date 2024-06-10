@@ -5,6 +5,8 @@ import com.example.listings.models.ListingModel;
 import java.util.List;
 import com.example.listings.datasources.ListingService;
 import com.example.listings.generated.types.Amenity;
+import graphql.execution.DataFetcherResult;
+import graphql.schema.DataFetcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.example.listings.generated.types.CreateListingInput;
@@ -23,13 +25,21 @@ public class ListingDataFetcher {
     }
 
     @DgsQuery
-    public List<ListingModel> featuredListings() throws IOException {
-        return listingService.featuredListingsRequest();
+    public DataFetcherResult<List<ListingModel>> featuredListings() throws IOException {
+        List<ListingModel> listings = listingService.featuredListingsRequest();
+        return DataFetcherResult.<List<ListingModel>>newResult()
+                .data(listings)
+                .localContext("featuredListings")
+                .build();
     }
 
     @DgsQuery
-    public ListingModel listing(@InputArgument String id) {
-        return listingService.listingRequest(id);
+    public DataFetcherResult<ListingModel> listing(@InputArgument String id) {
+        ListingModel listing = listingService.listingRequest(id);
+        return DataFetcherResult.<ListingModel>newResult()
+                .data(listing)
+                .localContext("listing")
+                .build();
     }
 
     @DgsData(parentType="Listing")
