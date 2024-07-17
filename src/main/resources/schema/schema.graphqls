@@ -1,6 +1,8 @@
 type Query {
     "A curated array of listings to feature on the homepage"
     featuredListings: [Listing!]!
+    "Returns the details about this listing"
+    listing(id: ID!): Listing
 }
 
 "A particular intergalactic location available for booking"
@@ -8,6 +10,8 @@ type Listing {
     id: ID!
     "The listing's title"
     title: String!
+    "The listing's description"
+    description: String!
     "The number of beds available"
     numOfBeds: Int
     "The cost per night"
