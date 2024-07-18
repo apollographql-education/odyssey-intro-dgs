@@ -28,4 +28,12 @@ public class ListingService {
 
         return null;
     }
+
+    public ListingModel listingRequest(String id) {
+        return client
+                .get()
+                .uri("/listings/{listing_id}", id)
+                .retrieve()
+                .body(ListingModel.class);
+    }
 }

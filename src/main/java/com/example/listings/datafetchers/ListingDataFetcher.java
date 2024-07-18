@@ -6,6 +6,7 @@ import java.util.List;
 import com.example.listings.datasources.ListingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
+import com.netflix.graphql.dgs.InputArgument;
 
 @DgsComponent
 public class ListingDataFetcher {
@@ -19,5 +20,10 @@ public class ListingDataFetcher {
     @DgsQuery
     public List<ListingModel> featuredListings() throws IOException {
         return listingService.featuredListingsRequest();
+    }
+
+    @DgsQuery
+    public ListingModel listing(@InputArgument String id) {
+        return listingService.listingRequest(id);
     }
 }
