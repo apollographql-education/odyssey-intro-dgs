@@ -6,7 +6,13 @@ import java.util.List;
 import com.example.listings.datasources.ListingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
+import java.util.Map;
+
 import com.netflix.graphql.dgs.InputArgument;
+import com.netflix.graphql.dgs.DgsData;
+import com.example.listings.generated.types.Amenity;
+import com.netflix.graphql.dgs.DgsDataFetchingEnvironment;
+import graphql.execution.DataFetcherResult;
 
 @DgsComponent
 public class ListingDataFetcher {
@@ -18,12 +24,31 @@ public class ListingDataFetcher {
         this.listingService = listingService;
     }
     @DgsQuery
-    public List<ListingModel> featuredListings() throws IOException {
-        return listingService.featuredListingsRequest();
+    public DataFetcherResult<List<ListingModel>> featuredListings() throws IOException {
+        List<ListingModel> listings = listingService.featuredListingsRequest();
+        return DataFetcherResult.<List<ListingModel>>newResult()
+                .data(listings)
+                .localContext(Map.of("hasAmenityData", false))
+                .build();
     }
 
     @DgsQuery
-    public ListingModel listing(@InputArgument String id) {
-        return listingService.listingRequest(id);
+    public DataFetcherResult<ListingModel> listing(@InputArgument String id) {
+        ListingModel listing = listingService.listingRequest(id);
+        return DataFetcherResult.<ListingModel>newResult()
+                .data(listing)
+                .localContext(Map.of("hasAmenityData", true))
+                .build();
+    }
+
+    @DgsData(parentType="Listing")
+    public List<Amenity> amenities(DgsDataFetchingEnvironment dfe) throws IOException {
+        ListingModel listing = dfe.getSource();
+        String id = listing.getId();
+        Map<String, Boolean> localContext = dfe.getLocalContext();
+        if (localContext != null && localContext.get("hasAmenityData")) {
+            return listing.getAmenities();
+        }
+        return listingService.amenitiesRequest(id);
     }
 }
