@@ -13,6 +13,9 @@ import com.netflix.graphql.dgs.DgsData;
 import com.example.listings.generated.types.Amenity;
 import com.netflix.graphql.dgs.DgsDataFetchingEnvironment;
 import graphql.execution.DataFetcherResult;
+import com.netflix.graphql.dgs.DgsMutation;
+import com.example.listings.generated.types.CreateListingInput;
+import com.example.listings.generated.types.CreateListingResponse;
 
 @DgsComponent
 public class ListingDataFetcher {
@@ -50,5 +53,24 @@ public class ListingDataFetcher {
             return listing.getAmenities();
         }
         return listingService.amenitiesRequest(id);
+    }
+
+    @DgsMutation
+    public CreateListingResponse createListing(@InputArgument CreateListingInput input) {
+        CreateListingResponse response = new CreateListingResponse();
+        try {
+            ListingModel createdListing = listingService.createListingRequest(input);
+            response.setListing(createdListing);
+            response.setCode(200);
+            response.setMessage("success");
+            response.setSuccess(true);
+        } catch (Exception e) {
+            response.setListing(null);
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+            response.setSuccess(false);
+        }
+
+        return response;
     }
 }
