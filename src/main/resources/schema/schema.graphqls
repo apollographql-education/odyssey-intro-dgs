@@ -29,3 +29,34 @@ type Amenity {
     "The amenity's name"
     name: String!
 }
+
+type Mutation {
+    "Creates a new listing"
+    createListing(input: CreateListingInput!): CreateListingResponse!
+}
+
+input CreateListingInput {
+    "The listing's title"
+    title: String!
+    "The listing's description"
+    description: String!
+    "The number of beds available"
+    numOfBeds: Int!
+    "The cost per night"
+    costPerNight: Float!
+    "Indicates whether listing is closed for bookings (on hiatus)"
+    closedForBookings: Boolean
+    "The Listing's amenities"
+    amenities: [ID!]!
+}
+
+type CreateListingResponse {
+    "Similar to HTTP status code, represents the status of the mutation"
+    code: Int!
+    "Indicates whether the mutation was successful"
+    success: Boolean!
+    "Human-readable message for the UI"
+    message: String!
+    "The newly created listing"
+    listing: Listing
+}
