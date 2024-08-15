@@ -1,11 +1,10 @@
 package com.example.listings.datafetchers;
+
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.example.listings.models.ListingModel;
 import java.util.List;
 import com.example.listings.datasources.ListingService;
-import org.springframework.beans.factory.annotation.Autowired;
-import java.io.IOException;
 import java.util.Map;
 
 import com.netflix.graphql.dgs.InputArgument;
@@ -22,12 +21,12 @@ public class ListingDataFetcher {
 
     private final ListingService listingService;
 
-    @Autowired
     public ListingDataFetcher(ListingService listingService) {
         this.listingService = listingService;
     }
+
     @DgsQuery
-    public DataFetcherResult<List<ListingModel>> featuredListings() throws IOException {
+    public DataFetcherResult<List<ListingModel>> featuredListings() {
         List<ListingModel> listings = listingService.featuredListingsRequest();
         return DataFetcherResult.<List<ListingModel>>newResult()
                 .data(listings)
@@ -45,7 +44,7 @@ public class ListingDataFetcher {
     }
 
     @DgsData(parentType="Listing")
-    public List<Amenity> amenities(DgsDataFetchingEnvironment dfe) throws IOException {
+    public List<Amenity> amenities(DgsDataFetchingEnvironment dfe) {
         ListingModel listing = dfe.getSource();
         String id = listing.getId();
         Map<String, Boolean> localContext = dfe.getLocalContext();
